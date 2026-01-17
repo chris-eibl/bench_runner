@@ -692,9 +692,17 @@ if __name__ == "__main__":
     parser.add_argument("head", help="The head .json file")
     parser.add_argument("output", help="Output filename")
     args = parser.parse_args()
-
-    ref = result.Result.from_filename(Path(args.ref))
-    head = result.Result.from_filename(Path(args.head))
+    filenames_as_labels = False
+    try:
+        ref = result.Result.from_filename(Path(args.ref))
+    except ValueError:
+        filenames_as_labels = True
+        ref = result.Result.from_arbitrary_filename(Path(args.ref))
+    try:
+        head = result.Result.from_filename(Path(args.head))
+    except ValueError:
+        filenames_as_labels = True
+        head = result.Result.from_arbitrary_filename(Path(args.head))
     compare = result.BenchmarkComparison(ref, head, "base")
 
-    compare.write_timing_plot(Path(args.output))
+    compare.write_timing_plot(Path(args.output), filenames_as_labels)

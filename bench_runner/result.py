@@ -231,15 +231,23 @@ class BenchmarkComparison(Comparison):
         head_data = self.head.get_timing_data()
         return self._get_combined_data(ref_data, head_data)
 
-    def write_timing_plot(self, filename: PathLike) -> None:
+    def write_timing_plot(self, filename: PathLike, filenames_as_labels: bool = False) -> None:
+        if filenames_as_labels:
+            head_label = self.head.filename.stem
+            ref_label = self.ref.filename.stem
+        else:
+            head_label = (
+                f"{unquote(self.head.fork)}-{self.head.ref}-"
+                f"{self.head.cpython_hash}"
+            )
+            ref_label = self.ref.version
         plot.plot_diff(
             self.get_timing_diff(),
             filename,
             (
                 "Timings of "
-                f"{unquote(self.head.fork)}-{self.head.ref}-"
-                f"{self.head.cpython_hash}"
-                f" vs. {self.ref.version}"
+                f"{head_label}"
+                f" vs. {ref_label}"
             ),
             ("slower", "faster"),
         )
